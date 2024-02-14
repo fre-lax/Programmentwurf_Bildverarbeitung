@@ -62,21 +62,64 @@ def find_edges(image,settings):
 
     return gray, gauss, edges
 
+def blue_mask(image):
+    height, width, _ = image.shape[:]
+    image2=np.zeros((height,width,3),np.uint8)
+
+    b, g, r = cv2.split(image)
+    mask = (b >120) & (r>10)
+    image2[mask] = (255,255,255) 
+
+
+    return image2
+
 def run(image, result, settings=(100,100)):
     # Finde Kanten im Bild
-    gray, gauss, edges = find_edges(image,settings)
+    blue_mask_image = blue_mask(image)
+    gray, gauss, edges = find_edges(blue_mask_image,settings)
     contours,ccc = find_contours(edges,settings)
     # Finde die kleinsten Rechtecke um die Konturen
-    rect = find_smallest_rect(contours, ccc)
+    rect_img, rects = find_smallest_rect(contours, ccc)
+
+    # Zeichne Rechteck ins bild
+    mit_rechteck = image.copy()
+    for r in rects:
+        cv2.drawContours(mit_rechteck, [r], 0, (10,200,40), 3)
+
+    # Schneide das Bild anhand des Rechtecks
+    final_crop = crop_and_rotate(image, rects[0])
 
     # Füge das Ergebnis dem result hinzu
+    result.append({"name":f"Blue Mask","data":blue_mask_image})
     result.append({"name":f"Gray","data":gray})
     result.append({"name":f"Gauss","data":gauss})
     result.append({"name":f"Edges {settings[0]/5}","data":edges})
     result.append({"name":f"Contours","data":contours})
-    result.append({"name":f"Rechteck","data":rect})
+    result.append({"name":f"Rectangle","data":rect_img})
+    result.append({"name":f"Final","data":mit_rechteck})
+    result.append({"name":f"Final Crop","data":final_crop})
+    
 
     return result
+
+def crop_and_rotate(image, rect):
+    box = np.int0(rect)
+    # Berechne die Breite und Höhe des Rechtecks
+    width = int(np.linalg.norm(box[1]-box[2]))
+    height = int(np.linalg.norm(box[2]-box[3]))
+    
+    src_pts = box.astype("float32")
+    dst_pts = np.array([[0, height-1],
+                        [0, 0],
+                        [width-1, 0],
+                        [width-1, height-1]], dtype="float32")
+    M = cv2.getPerspectiveTransform(src_pts, dst_pts)
+    warped = cv2.warpPerspective(image, M, (width, height))
+    # check if width is bigger than height
+    if width<height:
+        warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
+    return warped
+
 
 def find_contours(image, settings):
     # Finde die Konturen im Bild
@@ -106,7 +149,11 @@ def find_smallest_rect(image, contours):
     for r in rects:
         cv2.drawContours(img, [r], 0, (10,200,40), 3)
     
-    return img
+    # Finden des größten Rechtecks
+    biggest = max(rects, key=cv2.contourArea)
+
+    
+    return img, [biggest]
 
 # Nur ausführen, wenn das Skript direkt aufgerufen wird
 if __name__ == "__main__":
