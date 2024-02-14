@@ -26,3 +26,9 @@ Lösungsideen
    1) Konturen finden und dann kleinstmögliches Rechteck bestimmen
    2) Mögliche Herausforderung: Pins sind nicht sehr gut von Hintergrund zu unterscheiden
       1) Eventuell kann auch hier der Trick angewedente werden nur das PCB zu erkennen und dann "manuell" um die nötige Größe nach oben zu verlängern um auch die Pins mit im Bild zu haben
+
+
+###### 1) Kantenerkennung
+
+Erste Kantenerkennung:
+![alt text](image.png)
