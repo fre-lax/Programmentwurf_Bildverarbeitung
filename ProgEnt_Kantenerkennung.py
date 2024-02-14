@@ -45,24 +45,29 @@ def get_output_folder():
 
     return folder_selected
 
-def find_edges(image):
+def find_edges(image,settings):
     # Erstelle ein leeres Bild
     edges = np.zeros(image.shape, dtype=np.uint8)
 
     # Konvertiere das Bild in Graustufen
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+    # weichzeichnen
+    gauss = cv2.GaussianBlur(gray, (19,19),0)
+
     # Finde die Kanten im Bild
-    edges = cv2.Canny(gray, 100, 200)
+    edges = cv2.Canny(gauss, settings[0]/5, 1)
 
-    return edges
+    return gray, gauss, edges
 
-def run(image, result, settings=(2,50)):
+def run(image, result, settings=(100,100)):
     # Finde Kanten im Bild
-    edges = find_edges(image)
+    gray, gauss, edges = find_edges(image,settings)
 
     # Füge das Ergebnis dem result hinzu
-    result.append({"name":"Edges","data":edges})
+    result.append({"name":f"Gray","data":gray})
+    result.append({"name":f"Gauss","data":gauss})
+    result.append({"name":f"Edges {settings[0]/5}","data":edges})
 
     return result
 
