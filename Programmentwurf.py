@@ -335,9 +335,3 @@ if __name__ == '__main__':
             x=input()
             if x=="x":
                 break
-
-        # if user presses x, stop the loop
-        #if cv2.waitKey(0) & 0xFF == ord('x'):
-        #    break
-        # any other key, close the window
-        #cv2.destroyAllWindows()
