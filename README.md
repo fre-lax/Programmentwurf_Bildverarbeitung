@@ -32,3 +32,6 @@ Lösungsideen
 
 Erste Kantenerkennung:
 ![alt text](image.png)
+
+Update mit Gauss-Weichzeichner und anderen Einstellungen:
+![alt text](image-1.png)
