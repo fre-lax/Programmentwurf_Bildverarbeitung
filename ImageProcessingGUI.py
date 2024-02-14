@@ -210,7 +210,7 @@ class MainWindow(QMainWindow):
         self.sld1L = QLabel()
         for start_val, slider, label in zip([self.config["val1"],self.config["val2"]], [self.sld1,self.sld2], [self.sld1L,self.sld2L]):
             #slider.sliderReleased.connect(self.update)
-            slider.setRange(0, 255)
+            slider.setRange(0, 1000)
             slider.setPageStep(1)
             slider.setValue(start_val)
             label.setText(str(start_val))
