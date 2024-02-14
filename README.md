@@ -35,3 +35,10 @@ Erste Kantenerkennung:
 
 Update mit Gauss-Weichzeichner und anderen Einstellungen:
 ![alt text](image-1.png)
+
+Erstelle Konturen von Kantenerkennung und Lege ein Rechteck darum
+![alt text](image-2.png)
+![alt text](image-3.png)
+
+Wie zu sehen: Noch nicht zuverlässig. Bei den meißten Bildern klappt es gut, aber noch nicht immer.
+Außerdem sind es noch mehrere Rechtecke
