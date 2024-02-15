@@ -59,3 +59,5 @@ Und zugeschnitten/ gedreht:
 Bei der Batch-Bearbeitung fielen weitere Fehler auf. Fast ausschließlich bei anomalen PCBs.
 Vermutlich insbesondere durch die Blau-Maske
 ![alt text](image-8.png)
+
+Veränderung der Parameter für Blaumaske und gausscher Weichzeichner vor der Blaumaske fürten zu starker Verbesserung der Ergebnisse

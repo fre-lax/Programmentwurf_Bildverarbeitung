@@ -66,8 +66,11 @@ def blue_mask(image):
     height, width, _ = image.shape[:]
     image2=np.zeros((height,width,3),np.uint8)
 
-    b, g, r = cv2.split(image)
-    mask = (b >120) & (r>10)
+    # weichzeichnen
+    gauss = cv2.GaussianBlur(image, (19,19),0)
+
+    b, g, r = cv2.split(gauss)
+    mask = (b >130) & (r>10) & (g>60)
     image2[mask] = (255,255,255) 
 
 
