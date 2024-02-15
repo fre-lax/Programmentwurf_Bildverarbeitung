@@ -55,3 +55,7 @@ Das Rechteck wird ins urpsrüngliche Foto eingezeichnet:
 ![alt text](image-6.png)
 Und zugeschnitten/ gedreht:
 ![alt text](image-7.png)
+
+Bei der Batch-Bearbeitung fielen weitere Fehler auf. Fast ausschließlich bei anomalen PCBs.
+Vermutlich insbesondere durch die Blau-Maske
+![alt text](image-8.png)

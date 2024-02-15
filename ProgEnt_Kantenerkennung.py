@@ -77,7 +77,7 @@ def run(image, result, settings=(100,100)):
     # Finde Kanten im Bild
     blue_mask_image = blue_mask(image)
     gray, gauss, edges = find_edges(blue_mask_image,settings)
-    contours,ccc = find_contours(edges,settings)
+    contours,ccc = find_contours(edges)
     # Finde die kleinsten Rechtecke um die Konturen
     rect_img, rects = find_smallest_rect(contours, ccc)
 
@@ -121,7 +121,7 @@ def crop_and_rotate(image, rect):
     return warped
 
 
-def find_contours(image, settings):
+def find_contours(image):
     # Finde die Konturen im Bild
     contours, hierarchy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # Verwerfe Konturen die zu klein sind
@@ -161,3 +161,35 @@ if __name__ == "__main__":
     files = get_images()
     output_folder = get_output_folder()
 
+    for file in files:
+        # Lade das Bild
+        image = cv2.imread(file)
+
+        blue_mask_image = blue_mask(image)
+
+        gray, gauss, edges = find_edges(blue_mask_image,[20])
+        contours,ccc = find_contours(edges)
+        # Finde die kleinsten Rechtecke um die Konturen
+        rect_img, rects = find_smallest_rect(contours, ccc)
+
+        # Zeichne Rechteck ins bild
+        mit_rechteck = image.copy()
+        for r in rects:
+            cv2.drawContours(mit_rechteck, [r], 0, (10,200,40), 3)
+
+        # Schneide das Bild anhand des Rechtecks
+        final_crop = crop_and_rotate(image, rects[0])
+
+        # Speichere das Bild
+        filename = os.path.basename(file)
+        filename = filename.split('.')[0]
+        if "Anomaly" in file:
+            subfolder = "Anomaly"
+        elif "Normal" in file:
+            subfolder = "Normal"
+        else:
+            subfolder = "Unknown"
+        this_path = f'{output_folder}/{subfolder}'
+        if not os.path.exists(this_path):
+            os.makedirs(this_path)
+        cv2.imwrite(f'{this_path}/{filename}_crop.jpg', final_crop)
