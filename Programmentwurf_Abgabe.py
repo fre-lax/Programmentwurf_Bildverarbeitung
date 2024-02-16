@@ -1,5 +1,12 @@
 import numpy as np
 import cv2
+import tkinter as tk
+from tkinter import filedialog
+import os
+import random
+import time
+import multiprocessing
+
 
 
 def run(image, result, settings=(100,100)):
@@ -208,7 +215,11 @@ def get_images():
     return files
 
 
-def verabeiten(image):
+def verabeiten(file, output_dir):
+    svm=init_svm()
+    train_data, response_data,colors,labels = set_training_pixels()
+    svm=train_svm(svm, train_data, response_data)
+    image = cv2.imread(file)
     settings=(149,255)
     predicted=predict_svm(svm, image)
     color_predicted,all_classes=color_predict(predicted,colors)
@@ -219,8 +230,7 @@ def verabeiten(image):
     cropped=crop_and_rotate(image,box)
     rotated=ausrichtung_korrigieren(cropped,svm)
     scaled=scale_down(rotated)
-    
-    return scaled
+    save_image(scaled, output_dir, file)
     
 
 # Zielordner für Bilder
@@ -261,33 +271,23 @@ def save_image(image, output_dir, file):
     cv2.imwrite(f'{save_path}/{filename}_crop.png', image)
 
 if __name__ == '__main__':
-    # frage nutzer nach quellverzeichnis
-    import tkinter as tk
-    from tkinter import filedialog
-    import os
-    import random
+
+    start_tick = time.time()
     root = tk.Tk()
     root.withdraw()
     files=get_images()
-
     output_dir = get_output_folder()
 
-    svm=init_svm()
-    train_data, response_data,colors,labels = set_training_pixels()
-    svm=train_svm(svm, train_data, response_data)
+    tasks = [(file, output_dir) for file in files]
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        results = pool.starmap(verabeiten, tasks)
 
-
-
-    import time
-    start_tick = time.time()
-    for file in files:
-        start=time.time()
-        image = cv2.imread(file)
-        result=verabeiten(image)
-        save_image(result, output_dir, file)
-        print(f'Verarbeitung von {file.split("/")[-1]} dauerte {(time.time()-start)*1000} Millisekunden.')
+    # Close the pool and wait for each task to complete
+    pool.close()
+    pool.join()
 
     print(f'Verarbeitung von {len(files)} Bildern dauerte {time.time()-start_tick} Sekunden.')
+
 
         
 
