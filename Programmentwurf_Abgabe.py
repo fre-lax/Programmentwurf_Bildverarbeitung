@@ -216,9 +216,9 @@ def get_images():
 
 
 def verabeiten(file, output_dir):
-    svm=init_svm()
-    train_data, response_data,colors,labels = set_training_pixels()
-    svm=train_svm(svm, train_data, response_data)
+    start=time.time()
+    global svm
+    global colors
     image = cv2.imread(file)
     settings=(149,255)
     predicted=predict_svm(svm, image)
@@ -231,6 +231,7 @@ def verabeiten(file, output_dir):
     rotated=ausrichtung_korrigieren(cropped,svm)
     scaled=scale_down(rotated)
     save_image(scaled, output_dir, file)
+    print(f'Verarbeitung von {file.split("/")[-1]} dauerte {(time.time()-start)*1000} ms.')
     
 
 # Zielordner für Bilder
@@ -270,7 +271,16 @@ def save_image(image, output_dir, file):
 
     cv2.imwrite(f'{save_path}/{filename}_crop.png', image)
 
+def init_worker():
+    global svm
+    global colors
+    svm=init_svm()
+    train_data, response_data,colors,labels = set_training_pixels()
+    svm=train_svm(svm, train_data, response_data)
+
 if __name__ == '__main__':
+    svm=None
+    colors=None
 
     start_tick = time.time()
     root = tk.Tk()
@@ -279,7 +289,7 @@ if __name__ == '__main__':
     output_dir = get_output_folder()
 
     tasks = [(file, output_dir) for file in files]
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+    with multiprocessing.Pool(initializer= init_worker,processes=multiprocessing.cpu_count()) as pool:
         results = pool.starmap(verabeiten, tasks)
 
     # Close the pool and wait for each task to complete
@@ -287,7 +297,4 @@ if __name__ == '__main__':
     pool.join()
 
     print(f'Verarbeitung von {len(files)} Bildern dauerte {time.time()-start_tick} Sekunden.')
-
-
-        
-
+    print(f'Durchschnittliche Zeit pro Bild: {(time.time()-start_tick)/len(files)} Sekunden.')
