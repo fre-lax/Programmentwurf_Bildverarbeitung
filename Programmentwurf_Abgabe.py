@@ -10,6 +10,7 @@ import multiprocessing
 
 
 def run(image, result, settings=(100,100)):
+    start=time.time()
 
     svm=init_svm()
     train_data, response_data,colors,labels = set_training_pixels()
@@ -33,7 +34,8 @@ def run(image, result, settings=(100,100)):
     result.append({"name":f"final selection","data":final_selction})
     result.append({"name":f"cropped","data":cropped})
     result.append({"name":f"cropped and rotated","data":rotated})
-    result.append({"name":f"scaled to 50%","data":scaled})
+    result.append({"name":f"scaled to 50% - runtime: {round((time.time()-start)*1000)} ms","data":scaled})
+    return result
 
 
 def gray_image(image):
