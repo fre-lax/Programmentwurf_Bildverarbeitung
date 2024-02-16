@@ -278,6 +278,13 @@ def verabeiten(file, output_dir):
     global svm
     global colors
     image = cv2.imread(file)
+
+    original_image=image.copy()
+    scale_factor=0.6
+    if scale_factor!=1:
+        image = cv2.medianBlur(image,5)
+        image=scale_image(image,100*scale_factor)
+
     settings=(149,255)
     predicted=predict_svm(svm, image)
     color_predicted,all_classes=color_predict(predicted,colors)
@@ -285,9 +292,12 @@ def verabeiten(file, output_dir):
     thresholed_image,contours = find_contours(gray,settings)
     merged_contours_img=fill_largest_rectangle(thresholed_image, contours,settings)
     final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
-    cropped=crop_and_rotate(image,box)
+
+    box=box/scale_factor
+
+    cropped=crop_and_rotate(original_image,box)
     rotated=ausrichtung_korrigieren(cropped,svm)
-    scaled=scale_image(rotated)
+    scaled=scale_image(rotated,50)
     save_image(scaled, output_dir, file)
     print(f'Verarbeitung von {file.split("/")[-1]} dauerte {(time.time()-start)*1000} ms.')
     
@@ -333,7 +343,7 @@ def init_worker():
     global svm
     global colors
     svm=init_svm()
-    train_data, response_data,colors,labels = set_training_pixels()
+    train_data, response_data,colors,labels = set_training_area()
     svm=train_svm(svm, train_data, response_data)
 
 if __name__ == '__main__':
