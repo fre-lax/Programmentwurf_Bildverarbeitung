@@ -219,19 +219,6 @@ def verabeiten(image):
     cropped=crop_and_rotate(image,box)
     rotated=ausrichtung_korrigieren(cropped,svm)
     scaled=scale_down(rotated)
-    # delete all variables
-    del predicted
-    del color_predicted
-    del all_classes
-    del gray
-    del thresholed_image
-    del contours
-    del merged_contours_img
-    del final_selction
-    del box
-    del cropped
-    del rotated
-    del image
     
     return scaled
     
@@ -291,17 +278,16 @@ if __name__ == '__main__':
 
 
 
-
+    import time
+    start_tick = time.time()
     for file in files:
+        start=time.time()
         image = cv2.imread(file)
         result=verabeiten(image)
         save_image(result, output_dir, file)
-        # run garbarge collector
-        del result
-        del image
-        import gc
-        gc.collect()
+        print(f'Verarbeitung von {file.split("/")[-1]} dauerte {(time.time()-start)*1000} Millisekunden.')
+
+    print(f'Verarbeitung von {len(files)} Bildern dauerte {time.time()-start_tick} Sekunden.')
 
         
 
-    # print(files)
