@@ -11,6 +11,11 @@ import multiprocessing
 
 def run(image, result, settings=(100,100)):
     start=time.time()
+    original_image=image.copy()
+    scale_factor=1
+    if scale_factor!=1:
+        image = cv2.medianBlur(image,1)
+        image=scale_image(image,100*scale_factor)
 
     svm=init_svm()
     train_data, response_data,colors,labels = set_training_pixels()
@@ -21,10 +26,14 @@ def run(image, result, settings=(100,100)):
     thresholed_image,contours = find_contours(gray,settings)
     merged_contours_img=fill_largest_rectangle(thresholed_image, contours,settings)
     final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
-    cropped=crop_and_rotate(image,box)
-    rotated=ausrichtung_korrigieren(cropped,svm)
-    scaled=scale_down(rotated)
 
+    box=box/scale_factor
+
+    cropped=crop_and_rotate(original_image,box)
+    rotated=ausrichtung_korrigieren(cropped,svm)
+    scaled=scale_image(rotated,50)
+
+    result.append({"name":f"Scaled","data":image})
     result.append({"name":f"KI Predicted","data":predicted})
     result.append({"name":f"KI Color Predicted","data":all_classes})
     result.append({"name":f"KI Color Predicted, Pin class = board class = white","data":color_predicted})
@@ -182,10 +191,8 @@ def ausrichtung_korrigieren(cropped_image,svm):
         cropped_image = cv2.rotate(cropped_image, cv2.ROTATE_180)
     return cropped_image
 
-def scale_down(image):
+def scale_image(image,scale_percent):
     scaled=image.copy()
-    # scale down image
-    scale_percent = 50 # percent of original size
     width = int(scaled.shape[1] /100*scale_percent)
     height = int(scaled.shape[0] /100* scale_percent)
     dim = (width, height)
@@ -231,7 +238,7 @@ def verabeiten(file, output_dir):
     final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
     cropped=crop_and_rotate(image,box)
     rotated=ausrichtung_korrigieren(cropped,svm)
-    scaled=scale_down(rotated)
+    scaled=scale_image(rotated)
     save_image(scaled, output_dir, file)
     print(f'Verarbeitung von {file.split("/")[-1]} dauerte {(time.time()-start)*1000} ms.')
     
