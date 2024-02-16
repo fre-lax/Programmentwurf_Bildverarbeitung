@@ -15,6 +15,7 @@ def run(image, result, settings=(100,100)):
     final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
 
     cropped=crop_and_rotate(image,box)
+    rotated=ausrichtung_korrigieren(cropped,svm)
 
     result.append({"name":f"KI Predicted","data":predicted})
     result.append({"name":f"KI Color Predicted","data":all_classes})
@@ -24,6 +25,7 @@ def run(image, result, settings=(100,100)):
     result.append({"name":f"Merged Contours","data":merged_contours_img})
     result.append({"name":f"final selection","data":final_selction})
     result.append({"name":f"cropped","data":cropped})
+    result.append({"name":f"cropped and rotated","data":rotated})
 
 
 def gray_image(image):
@@ -153,6 +155,25 @@ def crop_and_rotate(image, rect):
     if width<height:
         warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
     return warped
+
+def ausrichtung_korrigieren(cropped_image,svm):
+    # get olnly lower third of image
+    lower_third = cropped_image[int(cropped_image.shape[0]/100*90):int(cropped_image.shape[0]*92/100),:,:]
+    # predict class of lower third
+    predicted=predict_svm(svm, lower_third)
+    # count appearences of class 1 in predicted
+    counter=0
+    for row in predicted:
+        for pixel in row:
+            if pixel==1:
+                counter+=1
+    if counter<1000:
+        # rotate image 180 degree
+        cropped_image = cv2.rotate(cropped_image, cv2.ROTATE_180)
+    return cropped_image
+
+        
+
 
 
 if __name__ == '__main__':
