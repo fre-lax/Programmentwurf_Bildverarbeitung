@@ -13,9 +13,9 @@ def run(image, result, settings=(100,100)):
     thresholed_image,contours = find_contours(gray,settings)
     merged_contours_img=fill_largest_rectangle(thresholed_image, contours,settings)
     final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
-
     cropped=crop_and_rotate(image,box)
     rotated=ausrichtung_korrigieren(cropped,svm)
+    scaled=scale_down(rotated)
 
     result.append({"name":f"KI Predicted","data":predicted})
     result.append({"name":f"KI Color Predicted","data":all_classes})
@@ -26,6 +26,7 @@ def run(image, result, settings=(100,100)):
     result.append({"name":f"final selection","data":final_selction})
     result.append({"name":f"cropped","data":cropped})
     result.append({"name":f"cropped and rotated","data":rotated})
+    result.append({"name":f"scaled to 50%","data":scaled})
 
 
 def gray_image(image):
@@ -172,9 +173,23 @@ def ausrichtung_korrigieren(cropped_image,svm):
         cropped_image = cv2.rotate(cropped_image, cv2.ROTATE_180)
     return cropped_image
 
-        
+def scale_down(image):
+    scaled=image.copy()
+    # scale down image
+    scale_percent = 50 # percent of original size
+    width = int(scaled.shape[1] /100*scale_percent)
+    height = int(scaled.shape[0] /100* scale_percent)
+    dim = (width, height)
+    scaled = cv2.resize(scaled, dim, interpolation = cv2.INTER_AREA)
+    return scaled
 
 
 
 if __name__ == '__main__':
-    pass
+    # frage nutzer nach quellverzeichnis
+    import tkinter as tk
+    from tkinter import filedialog
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askdirectory()
+    print(file_path)
