@@ -12,13 +12,13 @@ import multiprocessing
 def run(image, result, settings=(100,100)):
     start=time.time()
     original_image=image.copy()
-    scale_factor=1
+    scale_factor=0.4
     if scale_factor!=1:
-        image = cv2.medianBlur(image,1)
+        image = cv2.medianBlur(image,5)
         image=scale_image(image,100*scale_factor)
 
     svm=init_svm()
-    train_data, response_data,colors,labels = set_training_pixels()
+    train_data, response_data,colors,train_image = set_training_area()
     svm=train_svm(svm, train_data, response_data)
     predicted=predict_svm(svm, image)
     color_predicted,all_classes=color_predict(predicted,colors)
@@ -33,6 +33,7 @@ def run(image, result, settings=(100,100)):
     rotated=ausrichtung_korrigieren(cropped,svm)
     scaled=scale_image(rotated,50)
 
+    result.append({"name":f"Train Image","data":train_image})
     result.append({"name":f"Scaled","data":image})
     result.append({"name":f"KI Predicted","data":predicted})
     result.append({"name":f"KI Color Predicted","data":all_classes})
@@ -77,6 +78,56 @@ def set_training_pixels():
 
     return train_data, response_data,colors,labels
 
+def set_training_area():
+    training_image = cv2.imread('./training_image_svm_0000.JPG')
+
+
+        # define to corners of areas for training
+    # no_pcb
+    x1,y1=147,192
+    x2,y2=x1+30,y1+10
+    # pin:
+    x3,y3=207,628
+    x4,y4=x3+30,y3+10
+    # pcb:
+    x5,y5=669,404
+    x6,y6=x5+30,y5+10
+
+    # draw rectangles around areas
+    cv2.rectangle(training_image,(y1,x1),(y2,x2),(0,0,255),2)
+    cv2.rectangle(training_image,(y3,x3),(y4,x4),(0,0,255),2)
+    cv2.rectangle(training_image,(y5,x5),(y6,x6),(0,0,255),2)
+
+    # create training data
+    colors=[]
+    labels=[]
+    # background
+    for x in range(x1,x2):
+        for y in range(y1,y2):
+            colors.append(training_image[x,y])
+            labels.append(2)
+
+    # pin
+    for x in range(x3,x4):
+        for y in range(y3,y4):
+            colors.append(training_image[x,y])
+            labels.append(0)
+    
+    # pcb
+    for x in range(x5,x6):
+        for y in range(y5,y6):
+            colors.append(training_image[x,y])
+            labels.append(1)
+            
+    
+    train_data=np.array(colors,dtype=np.float32)
+    response_data=np.array(labels,dtype=np.int32)
+
+    return train_data, response_data, colors, training_image
+
+    
+
+
 def train_svm(svm, train_data, response_data):
 
     svm.train(train_data, cv2.ml.ROW_SAMPLE, response_data)
@@ -91,7 +142,7 @@ def predict_svm(svm, image):
 
 def color_predict(image,colors):
     color=np.array(colors).astype(np.uint8)
-    colored_image=color[(image.copy()*2).astype(int)]
+    colored_image=color[(image.copy()*(2)).astype(int)]
     # make class 0 and 2 white
     all_classes=colored_image.copy()
     colored_image[(image==0)]=255
@@ -111,8 +162,6 @@ def find_contours(image,settings):
 
     return thresholed_image,biggest
 
-def set_training_area():
-    pass
 
 def fill_largest_rectangle(image, contours,settings):
     rect_img=image.copy()
