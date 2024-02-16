@@ -215,7 +215,7 @@ class MainWindow(QMainWindow):
 
         self.comboScripts = QComboBox(self)
         for file in os.listdir("."):
-            if (file.endswith(".py") and file!=os.path.basename(__file__)):
+            if (file.endswith(".py") and file!=os.path.basename(__file__)) and not "ImageProcessingGUI" in file:
                 f = open(file, "r").read()
                 if(f.__contains__("def run(")):
                     try:
