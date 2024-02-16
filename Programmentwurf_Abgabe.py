@@ -11,13 +11,18 @@ def run(image, result, settings=(100,100)):
     color_predicted=color_predict(predicted,colors)
     gray = gray_image(color_predicted)
     thresholed_image,contours = find_contours(gray,settings)
-    rect=find_rectangle(thresholed_image, contours)
+    merged_contours_img=fill_largest_rectangle(thresholed_image, contours,settings)
+    final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
+
+    cropped=crop_and_rotate(image,box)
 
     result.append({"name":f"KI Predicted","data":predicted})
     result.append({"name":f"KI Color Predicted","data":color_predicted})
     result.append({"name":f"KI Color Predicted_gray","data":gray})
     result.append({"name":f"Contours","data":thresholed_image})
-    result.append({"name":f"Rectangle","data":rect})
+    result.append({"name":f"Merged Contours","data":merged_contours_img})
+    result.append({"name":f"final selection","data":final_selction})
+    result.append({"name":f"cropped","data":cropped})
 
 
 def gray_image(image):
@@ -86,24 +91,11 @@ def find_contours(image,settings):
 def set_training_area():
     pass
 
-def find_rectangle(image, contours):
-    # points = [pt for contour in contours for pt in contour]
-
-    # # Ensure points is a proper sequence for np.vstack
-    # points = np.array(points).reshape(-1, 2) # Reshape if necessary
-
-    # # Now, use np.vstack to stack. Since points is already a proper numpy array, this step might be redundant
-    # all_points = np.vstack(points)
-    # all_points = np.array(all_points, dtype=np.float32).reshape((-1, 1, 2))
-    # # add all neighboring points to the list
-    # for i in range(len(points)):
-    #     all_points = np.vstack((all_points, np.array([points[i-1],points[i]], dtype=np.float32).reshape((-1, 1, 2)))    )
-
-    all_points = contours
+def fill_largest_rectangle(image, contours,settings):
     rect_img=image.copy()
     # find rectangles
     rects = []
-    for c in all_points:
+    for c in contours:
         rect = cv2.minAreaRect(c)
         box = cv2.boxPoints(rect)
         box = np.int0(box)
@@ -111,8 +103,55 @@ def find_rectangle(image, contours):
     # draw rectangles
     for r in rects:
         cv2.drawContours(rect_img, [r], 0, (0,0,255), 3)
-    return rect_img
+
+    merge_contours =np.zeros((image.shape[0],image.shape[1],3), dtype=np.uint8)
+    # set complete image to 50 50 50
+    merge_contours[:,:,:]=50
+    # get largest rectangle 
+    max_rect = max(rects, key=cv2.contourArea)
+    cv2.fillPoly(merge_contours, pts =[max_rect], color=(255,255,255))
+    # draw all contours
+    cv2.fillPoly(merge_contours, pts =contours, color=(255,255,255))
+    return merge_contours
+
+def find_final_rectangle(merged_contours_img,original_image,settings):
+    final_contours_img = merged_contours_img.copy()
+    # find contours in new image
+    final_contours_img = cv2.cvtColor(final_contours_img, cv2.COLOR_BGR2GRAY)
+    final_contours_img, contours = find_contours(final_contours_img,settings)
     
+
+    cv2.drawContours(final_contours_img, contours, -1, (0,255,255), 1)
+    #find largest contour
+    biggest = max(contours, key=cv2.contourArea)
+    # find rectangle in new image
+    rect = cv2.minAreaRect(biggest)
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
+    final_box=original_image.copy()
+    cv2.drawContours(final_box, [box], 0, (255,255,0), 1)
+
+    return final_box, box
+    
+
+def crop_and_rotate(image, rect):
+    box = np.int0(rect)
+    # Berechne die Breite und Höhe des finalen Bildes
+    width = int(np.linalg.norm(box[1]-box[2]))
+    height = int(np.linalg.norm(box[2]-box[3]))
+    
+    src_pts = box.astype("float32")
+    dst_pts = np.array([[0, height-1],
+                        [0, 0],
+                        [width-1, 0],
+                        [width-1, height-1]], dtype="float32")
+    M = cv2.getPerspectiveTransform(src_pts, dst_pts)
+    warped = cv2.warpPerspective(image, M, (width, height))
+    # check if width is bigger than height
+    if width<height:
+        warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
+    return warped
+
 
 if __name__ == '__main__':
     pass
