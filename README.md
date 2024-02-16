@@ -14,7 +14,7 @@ Bilder hier zu finden: [Google Drive]()
 
 Lösungsideen
 
-1) Kantenerkennung (PCB ist Recheckig)
+1) Kantenerkennung (PCB ist rechteckig)
    1) Mit Kanten Konturen finden, um Konturen kleinstmögliches Rechteck legen
    2) Pins des PCB sind sehr dünn, haben ähnliche Farbe wie Hintergrund
    3) Manche PCB haben deutlich helle Kanten auf allen vier Seiten (gut) andere sind nicht so gut zu Erkennen
@@ -28,6 +28,10 @@ Lösungsideen
    2) Mögliche Herausforderung: Pins sind nicht sehr gut von Hintergrund zu unterscheiden
       1) Eventuell kann auch hier der Trick angewedente werden nur das PCB zu erkennen und dann "manuell" um die nötige Größe nach oben zu verlängern um auch die Pins mit im Bild zu haben
 
+###### Rotation und Ausschneiden
+1) Kleinstes Rechteck finden, mit Eckpunkten
+2) Moment bestimmen
+3) Rotieren und ausschneiden
 
 ###### 1) Kantenerkennung
 
