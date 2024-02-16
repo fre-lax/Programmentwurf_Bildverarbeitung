@@ -8,7 +8,7 @@ def run(image, result, settings=(100,100)):
     train_data, response_data,colors,labels = set_training_pixels()
     svm=train_svm(svm, train_data, response_data)
     predicted=predict_svm(svm, image)
-    color_predicted=color_predict(predicted,colors)
+    color_predicted,all_classes=color_predict(predicted,colors)
     gray = gray_image(color_predicted)
     thresholed_image,contours = find_contours(gray,settings)
     merged_contours_img=fill_largest_rectangle(thresholed_image, contours,settings)
@@ -17,7 +17,8 @@ def run(image, result, settings=(100,100)):
     cropped=crop_and_rotate(image,box)
 
     result.append({"name":f"KI Predicted","data":predicted})
-    result.append({"name":f"KI Color Predicted","data":color_predicted})
+    result.append({"name":f"KI Color Predicted","data":all_classes})
+    result.append({"name":f"KI Color Predicted, Pin class = board class = white","data":color_predicted})
     result.append({"name":f"KI Color Predicted_gray","data":gray})
     result.append({"name":f"Contours","data":thresholed_image})
     result.append({"name":f"Merged Contours","data":merged_contours_img})
@@ -71,9 +72,10 @@ def color_predict(image,colors):
     color=np.array(colors).astype(np.uint8)
     colored_image=color[(image.copy()*2).astype(int)]
     # make class 0 and 2 white
+    all_classes=colored_image.copy()
     colored_image[(image==0)]=255
     colored_image[(image==1)]=255
-    return colored_image
+    return colored_image, all_classes
     
 def find_contours(image,settings):
     _, thresholed_image = cv2.threshold(image, 90,75, cv2.THRESH_BINARY)
