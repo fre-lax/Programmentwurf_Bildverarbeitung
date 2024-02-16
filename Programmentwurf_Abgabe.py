@@ -183,13 +183,125 @@ def scale_down(image):
     scaled = cv2.resize(scaled, dim, interpolation = cv2.INTER_AREA)
     return scaled
 
+# Finde Bilder die verarbeitet werden sollen
+def get_images():
+    # Erstelle Tkinter Fenster
+    window = tk.Tk()
+    window.withdraw()
 
+    # Nutzer nach Ordner fragen
+    folder_selected = filedialog.askdirectory(initialdir="./pcb2/Data/Images")
+    if folder_selected == '':
+        print('Kein Ordner ausgewählt')
+        return '',[]
+    print(f'Durchsuche Ordner nach Bildern: {folder_selected}')
+    
+    # Erhalte Liste aller Dateien im Ordner und seinen Unterordnern, falls Dateiendung .JPG
+    files = []
+    count = 0
+    for r, d, f in os.walk(folder_selected):
+        for file in f:
+            if '.JPG' in file:
+                files.append(os.path.join(r, file))
+                count += 1
+    print(f'Es wurden {count} Bilder gefunden.')
+    return files
+
+
+def verabeiten(image):
+    settings=(149,255)
+    predicted=predict_svm(svm, image)
+    color_predicted,all_classes=color_predict(predicted,colors)
+    gray = gray_image(color_predicted)
+    thresholed_image,contours = find_contours(gray,settings)
+    merged_contours_img=fill_largest_rectangle(thresholed_image, contours,settings)
+    final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
+    cropped=crop_and_rotate(image,box)
+    rotated=ausrichtung_korrigieren(cropped,svm)
+    scaled=scale_down(rotated)
+    # delete all variables
+    del predicted
+    del color_predicted
+    del all_classes
+    del gray
+    del thresholed_image
+    del contours
+    del merged_contours_img
+    del final_selction
+    del box
+    del cropped
+    del rotated
+    del image
+    
+    return scaled
+    
+
+# Zielordner für Bilder
+def get_output_folder():
+    # Erstelle Tkinter Fenster
+    window = tk.Tk()
+    window.withdraw()
+
+    # Nutzer nach Ordner fragen
+    folder_selected = filedialog.askdirectory(initialdir="./cropped_pcb_images/")
+    if folder_selected == '':
+        print('Kein Ordner ausgewählt')
+        return ''
+    print(f'Zielordner für Bilder: {folder_selected}')
+
+    return folder_selected
+
+def save_image(image, output_dir, file):
+    filename = os.path.basename(file)
+    filename = filename.split('.')[0]
+    if "Anomaly" in file:
+        subfolder = "Anomaly"
+    elif "Normal" in file:
+        subfolder = "Normal"
+    else:
+        subfolder = "Unknown"
+
+    if random.random() < 0.1:
+        subfolder='test/'+subfolder
+    else:
+        subfolder='lernen/'+subfolder
+
+    save_path = f'{output_dir}/{subfolder}'
+
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
+    cv2.imwrite(f'{save_path}/{filename}_crop.png', image)
 
 if __name__ == '__main__':
     # frage nutzer nach quellverzeichnis
     import tkinter as tk
     from tkinter import filedialog
+    import os
+    import random
     root = tk.Tk()
     root.withdraw()
-    file_path = filedialog.askdirectory()
-    print(file_path)
+    files=get_images()
+
+    output_dir = get_output_folder()
+
+    svm=init_svm()
+    train_data, response_data,colors,labels = set_training_pixels()
+    svm=train_svm(svm, train_data, response_data)
+
+
+
+
+    for file in files:
+        image = cv2.imread(file)
+        result=verabeiten(image)
+        save_image(result, output_dir, file)
+        # run garbarge collector
+        del result
+        del image
+        import gc
+        gc.collect()
+
+        
+
+    # print(files)
