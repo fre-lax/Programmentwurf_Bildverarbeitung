@@ -238,7 +238,7 @@ def verabeiten(file, output_dir):
     final_selction,box=find_final_rectangle(merged_contours_img,image,settings)
     cropped=crop_and_rotate(image,box)
     rotated=ausrichtung_korrigieren(cropped,svm)
-    scaled=scale_image(rotated)
+    scaled=scale_image(rotated,50)
     save_image(scaled, output_dir, file)
     print(f'Verarbeitung von {file.split("/")[-1]} dauerte {(time.time()-start)*1000} ms.')
     
