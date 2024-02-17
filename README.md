@@ -113,9 +113,9 @@ Dieser Ansatz wurde nicht getestet aufgrund der guten Ergebnisse des SCM-Modells
 7) Problem: Wenn alle Konturen der Pins getrennt vom PCB sind, kann mit der Funktion `cv2.minAreaRect(contour)` kein Rechteck gefunden werden, welches gleichzeitig alle Konturen beinhaltet:
 >![alt text](multiple-contours.png)
 >
->Die Pins werden zwar erkannt aber hängen nicht mit dem PCB zusammen.
+> Die Pins werden zwar erkannt aber hängen nicht mit dem PCB zusammen.
 
-Als einfacher Workaround, wird zunächst das Rechteck um die größte Kontur, sowie die restlichen Konturen selbst gezeichnet und ausgefüllt. Das Ergebnis ist ein Bild, in dem das PCB und die Pins weiß und der Hintergrund schwarz ist, wobei sich die jeweiligen Bereiche überschneiden:
+Als einfacher Workaround, wird zunächst das Rechteck um die größte Kontur, sowie die restlichen Konturen selbst gezeichnet und ausgefüllt (Alternatvi hätte man auch jeweils die Rechtecke ausfüllen können, allerdings hätte dies in einigen Fällen zu einem schlechteren Ergebnis geführt, da die minimalen Rechtecke um die Pin-Konturen teilweise schräg ausgerichtet waren und dies am Ende zu einem nach oben erweiterten Ausschnitt geführt hätte). Das Ergebnis ist ein Bild, in dem das PCB und die Pins weiß und der Hintergrund schwarz ist, wobei sich die jeweiligen Bereiche überschneiden:
 
 ![alt text](image-13.png)
 
