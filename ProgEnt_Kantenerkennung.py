@@ -76,6 +76,7 @@ def blue_mask(image):
 
     return image2
 
+
 def run(image, result, settings=(100,100)):
     # Finde Kanten im Bild
     blue_mask_image = blue_mask(image)
@@ -117,6 +118,7 @@ def crop_and_rotate(image, rect):
                         [width-1, 0],
                         [width-1, height-1]], dtype="float32")
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
+    print(M)
     warped = cv2.warpPerspective(image, M, (width, height))
     # check if width is bigger than height
     if width<height:
