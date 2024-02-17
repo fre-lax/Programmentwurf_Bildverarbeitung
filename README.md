@@ -10,7 +10,7 @@ Abgabe: 20.02.2024, online
 
 ##### Problem: PCB sind wesentlich inhomogener als Cashew-Nüsse
 
-Bilder hier zu finden: [Google Drive]()
+Bilder hier zu finden: [Google Drive](https://fs7.eu/programmentwurf-source)
 
 Lösungsideen
 
@@ -29,26 +29,29 @@ Lösungsideen
       1) Eventuell kann auch hier der Trick angewedente werden nur das PCB zu erkennen und dann "manuell" um die nötige Größe nach oben zu verlängern um auch die Pins mit im Bild zu haben
 
 
-###### 1) Versuch mit Kantenerkennung (von einzelner Person, Ansatz verworfen)
+###### 1) Versuch mit Kantenerkennung
+
+Dieser Ansatz wurde im Vorfeld der Gruppenarbeit von einem Gruppenmitglied getestet und hier dokumentiert. Durch die Aufgetretenen Probleme wurde dieser Ansatz nicht weiter verfolgt, da die Realisierung mittels SVM gut funktionierte.
+
 
 Erste Kantenerkennung:
 ![alt text](image.png)
 
-Update mit Gauss-Weichzeichner und anderen Einstellungen:
+Update mit Gauss-Weichzeichner vor der Kantenerkennung:
 ![alt text](image-1.png)
 
-Erstelle Konturen von Kantenerkennung und Lege ein Rechteck darum
+Konturenfindung und Rechteckbestimmung:
 ![alt text](image-2.png)
 ![alt text](image-3.png)
 
-Wie zu sehen: Noch nicht zuverlässig. Bei den meißten Bildern klappt es gut, aber noch nicht immer.
-Außerdem sind es noch mehrere Rechtecke
+Wie zu sehen: Noch keine zuverlässige Auswahl des PCBs möglich.
 
+**Neuer Ansatz:** 
 Zu Beginn wurde eine Blaumaske hinzugefügt:
-Bildbereiche mit den Bedingungen (b >120) & (r>10) werden auf weiß gesetzt, der recht auf schwarz
+Bildbereiche mit den Bedingungen (b >120) & (r>10) werden auf weiß gesetzt, der recht auf schwarz:
 ![alt text](image-4.png)
 
-Danach obige Schritte führt zu guten Ergebnissen:
+Erneute Anwendung der obigen Schritte führten zu besseren Ergebnissen:
 ![alt text](image-5.png)
 
 Das Rechteck wird ins urpsrüngliche Foto eingezeichnet:
@@ -56,11 +59,12 @@ Das Rechteck wird ins urpsrüngliche Foto eingezeichnet:
 Und zugeschnitten/ gedreht:
 ![alt text](image-7.png)
 
-Bei der Batch-Bearbeitung fielen weitere Fehler auf. Fast ausschließlich bei anomalen PCBs.
-Vermutlich insbesondere durch die Blau-Maske
+Bei der Batch-Bearbeitung fielen weitere Fehler auf. Fast ausschließlich bei anomalen PCBs, bei denen die Belichtung des Fotos nicht optimal war und dadurch der Hintergrund nicht eindeutig getrennt wurde:
 ![alt text](image-8.png)
 
-Veränderung der Parameter für Blaumaske und gausscher Weichzeichner vor der Blaumaske fürten zu starker Verbesserung der Ergebnisse
+
+##### 2) Lokalisierung der 4 Bohrlöcher
+Dieser Ansatz wurde nicht getestet aufgrund der guten Ergebnisse des SCM-Modells.
 
 ##### 3) SVM-Modell trainieren das PCB von Hintergrund unterscheiden kann
 
@@ -161,14 +165,15 @@ Wird der Programmentwurf selbst aufgerufen, ohne die GUI zu verwenden, wird die 
 
 ### Fazit
 
-Der Ergebnisdatensatz kann hier abgerufen werden: [google drive](http://fs7.eu/programmentwurf-result)
+Der Ergebnisdatensatz kann hier abgerufen werden: [Google Drive](http://fs7.eu/programmentwurf-result)
 
 
- - Genauigkeit: Zum Großteil sind die Dateien sehr gut ausgerichtet und zugeschnitten. Nur vereinzelt gibt es Ungenauigkeiten, wie z.B. bei folgendem Bild, bei dem der Ausschnitt zu groß gewählt wurde. 
+ - **Genauigkeit**: Zum Großteil sind die Dateien sehr gut ausgerichtet und zugeschnitten. Nur vereinzelt gibt es Ungenauigkeiten, wie z.B. bei folgendem Bild, bei dem der Ausschnitt zu groß gewählt wurde:
+![alt text](016_crop.png)
 
- - Laufzeit: Die Bearbeitung eines einzelnen Bildes dauert 100-200ms, allerdings kann diese Zeit in einer Batchbearbeitung auf ca. 50ms pro Bild verringert werden. FÜr eine Produktionsanlage, bei der eine schnelle Sortierung gewünscht ist, könnte dies bereits zu langsam sein. Durch eine Verbesserung des Algorithmus sollte es möglich sein, die Laufzeit um ein Vielfaches zu verringern. 
+ - **Laufzeit**: Die Bearbeitung eines einzelnen Bildes dauert 100-200ms, allerdings kann diese Zeit in einer Batchbearbeitung auf ca. 50ms pro Bild verringert werden. Für eine Produktionsanlage, bei der eine schnelle Sortierung gewünscht ist, könnte dies bereits zu langsam sein. Durch eine Verbesserung des Algorithmus sollte es möglich sein, die Laufzeit um ein Vielfaches zu verringern. 
 
- - Robustheit: Beim zur Verfügung gestellten Datensatz wurden alle Bilder korrekt ausgeschnitten (mit leicht variierender Genauigkeit). Bei Bildern mit anderer Belichtung oder anderen Farben könnte die Verarbeitung erschwert werden. Außerdem müsste für eine höhere Robustheit bei neuen Daten auch die Auflösung der Bilder betrachtet werden, da teilweise feste Schwellenwerte (z.b. für die minimale Konturgröße) gewählt wurden. 
+ - **Robustheit**: Beim zur Verfügung gestellten Datensatz wurden alle Bilder korrekt ausgeschnitten (mit leicht variierender Genauigkeit). Bei Bildern mit anderer Belichtung oder anderen Farben könnte die Verarbeitung erschwert werden. Außerdem müsste für eine höhere Robustheit bei neuen Daten auch die Auflösung der Bilder betrachtet werden, da teilweise feste Schwellenwerte (z.b. für die minimale Konturgröße) gewählt wurden. 
 
  Abschließend bleibt festzustellen, dass dieser intuitive Ansatz wahrscheinlich nicht genau so in einer Industrieanlage angewendet werden würde, allerdings hier zu guten Ergebnissen geführt hat. 
 
