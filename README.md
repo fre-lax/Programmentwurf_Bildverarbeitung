@@ -115,7 +115,12 @@ Dieser Ansatz wurde nicht getestet aufgrund der guten Ergebnisse des SCM-Modells
 >
 > Die Pins werden zwar erkannt aber hängen nicht mit dem PCB zusammen.
 
-Als einfacher Workaround, wird zunächst das Rechteck um die größte Kontur, sowie die restlichen Konturen selbst gezeichnet und ausgefüllt (Alternatvi hätte man auch jeweils die Rechtecke ausfüllen können, allerdings hätte dies in einigen Fällen zu einem schlechteren Ergebnis geführt, da die minimalen Rechtecke um die Pin-Konturen teilweise schräg ausgerichtet waren und dies am Ende zu einem nach oben erweiterten Ausschnitt geführt hätte). Das Ergebnis ist ein Bild, in dem das PCB und die Pins weiß und der Hintergrund schwarz ist, wobei sich die jeweiligen Bereiche überschneiden:
+Als einfacher Workaround, wird zunächst das Rechteck um die größte Kontur, sowie die restlichen Konturen selbst gezeichnet und ausgefüllt.
+Alternativ hätte man auch jeweils die Rechtecke ausfüllen können, allerdings hätte dies in einigen Fällen zu einem schlechteren Ergebnis geführt, da die minimalen Rechtecke um die Pin-Konturen teilweise schräg ausgerichtet waren und dies am Ende zu einem nach oben erweiterten Ausschnitt geführt hätte:
+>![alt text](image-15.png)
+> Hier hätte das kleinste Rechteck um alle ausgefüllten Rechtecke zu einem nach oben erweiterten Ausschnitt geführt.
+
+Das Ergebnis ist ein Bild, in dem das PCB und die Pins weiß und der Hintergrund schwarz ist, wobei sich die jeweiligen Bereiche überschneiden:
 
 ![alt text](image-13.png)
 
@@ -123,15 +128,14 @@ Als einfacher Workaround, wird zunächst das Rechteck um die größte Kontur, so
 
 9) Um die neu gefundene Kontur wird nun wieder das kleinste Rechteck gezeichnet:
 >![alt text](image-14.png) 
->
 > Gelb: Kontur um das PCB, blau: Kleinstes Rechteck um die Kontur
 
-10) Durch Bestimmung der Ecken des Rechtecks wird die Höhe und Breite des Zielbildes bestimmt und eine Transformationsmatrix M mithilfe der Funktion `M = cv2.getPerspectiveTransform(src_pts, dst_pts)
+10)  Durch Bestimmung der Ecken des Rechtecks wird die Höhe und Breite des Zielbildes bestimmt und eine Transformationsmatrix M mithilfe der Funktion `M = cv2.getPerspectiveTransform(src_pts, dst_pts)
 ` errechnet, welcher die Ecken des gefundenen Rechtecks (src_pts) und die Ecken des Zielrechtecks (dst_pts) übergeben werden.
 
-11)   Das Bild wird mithilfe der Funktion `cv2.warpPerspective(image, M, (width, height))` transformiert, wobei width und height die Breite und Höhe des Zielbildes sind. Falls die Breite kleiner ist, als die Höhe, wird das Bild um 90° gedreht.
+11)    Das Bild wird mithilfe der Funktion `cv2.warpPerspective(image, M, (width, height))` transformiert, wobei width und height die Breite und Höhe des Zielbildes sind. Falls die Breite kleiner ist, als die Höhe, wird das Bild um 90° gedreht.
   
-12)  Das Ergebnis ist das ausgeschnittene und gedrehte PCB:    
+12)   Das Ergebnis ist das ausgeschnittene und gedrehte PCB:    
 
 ![alt text](Ausgerichtet.jpg)
 
