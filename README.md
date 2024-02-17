@@ -31,7 +31,7 @@ Lösungsideen
 
 ###### 1) Versuch mit Kantenerkennung
 
-Dieser Ansatz wurde im Vorfeld der Gruppenarbeit von einem Gruppenmitglied getestet und hier dokumentiert. Durch die Aufgetretenen Probleme wurde dieser Ansatz nicht weiter verfolgt, da die Realisierung mittels SVM gut funktionierte.
+Dieser Ansatz wurde im Vorfeld der Gruppenarbeit von einem Gruppenmitglied getestet und hier dokumentiert. Durch die aufgetretenen Probleme wurde dieser Ansatz nicht weiter verfolgt, da die Realisierung mittels SVM gut funktionierte.
 
 
 Erste Kantenerkennung:
