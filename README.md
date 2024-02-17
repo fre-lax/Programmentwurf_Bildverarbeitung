@@ -161,3 +161,14 @@ Wird der Programmentwurf selbst aufgerufen, ohne die GUI zu verwenden, wird die 
 
 ### Fazit
 
+Der Ergebnisdatensatz kann hier abgerufen werden: [google drive](http://fs7.eu/programmentwurf-result)
+
+
+ - Genauigkeit: Zum Großteil sind die Dateien sehr gut ausgerichtet und zugeschnitten. Nur vereinzelt gibt es Ungenauigkeiten, wie z.B. bei folgendem Bild, bei dem der Ausschnitt zu groß gewählt wurde. 
+
+ - Laufzeit: Die Bearbeitung eines einzelnen Bildes dauert 100-200ms, allerdings kann diese Zeit in einer Batchbearbeitung auf ca. 50ms pro Bild verringert werden. FÜr eine Produktionsanlage, bei der eine schnelle Sortierung gewünscht ist, könnte dies bereits zu langsam sein. Durch eine Verbesserung des Algorithmus sollte es möglich sein, die Laufzeit um ein Vielfaches zu verringern. 
+
+ - Robustheit: Beim zur Verfügung gestellten Datensatz wurden alle Bilder korrekt ausgeschnitten (mit leicht variierender Genauigkeit). Bei Bildern mit anderer Belichtung oder anderen Farben könnte die Verarbeitung erschwert werden. Außerdem müsste für eine höhere Robustheit bei neuen Daten auch die Auflösung der Bilder betrachtet werden, da teilweise feste Schwellenwerte (z.b. für die minimale Konturgröße) gewählt wurden. 
+
+ Abschließend bleibt festzustellen, dass dieser intuitive Ansatz wahrscheinlich nicht genau so in einer Industrieanlage angewendet werden würde, allerdings hier zu guten Ergebnissen geführt hat. 
+
