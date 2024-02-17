@@ -12,7 +12,7 @@ Abgabe: 20.02.2024, online
 
 Bilder hier zu finden: [Google Drive](https://fs7.eu/programmentwurf-source)
 
-Lösungsideen
+###### Lösungsideen
 
 1) Kantenerkennung (PCB ist rechteckig)
    1) Mit Kanten Konturen finden, um Konturen kleinstmögliches Rechteck legen
